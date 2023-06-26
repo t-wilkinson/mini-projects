@@ -2,12 +2,21 @@
 Create an obnoxious program which will return any http request with one 'never gonna give you up' youtube video. To make this more obnoxious, overtime the program should further embed itself in the host system. To counteract this, create a second program which can systematically remove all traces of the adversary program.
 Makes getting rid of this program game-like. Progressively increase the change that infected computer gets rick rolled over time. Also progressively embed code into more files and create more ways that program will update iptables. For "ultimate" fun, also make it rewrite files with rick-roll lyrics.
 
-- Intercept linking process to insert code that writes the actual virus. Or... add a binary onto path that hides gcc, calls gcc with arguments, gets the output binary, and rewrite it there.
-- In terms of places to insert virus code, we can insert it into gcc, which would require sudo privaleges, or we can listen to calls.
-- Virus should be difficult to disable. IE removing a file, stopping a server, etc. shouldn't stop the virus from working.
-- The virus should intercept every http get request and return a rick-roll link. ways we can achieve this:
-    - Assume we have sudo privaleges run running the virus. We can add all users to some group that can run the virus without sudo.
-    - Can't listen to already listening ports.
+- NetEdit: generally useful program to intercept tcp requests
+- RickRollMania: malware which infects computer and progressively gets more destructive
+    - Infection: infect computer very covertly. Make it hard to detect and redundant.
+        - Intercept linking process to insert code that writes the actual virus. Or... add a binary onto path that hides gcc, calls gcc with arguments, gets the output binary, and rewrite it there.
+        - In terms of places to insert virus code, we can insert it into gcc, which would require sudo privaleges, or we can listen to calls.
+    - Intercept:
+        - make some http requests rick roll the user, getting progressively more common over time
+        - write "never gonna give you up" lyrics to random terminals, sockets, etc.
+    - Destruction: begin destroying files (rewriting them with "never gonna give you up lyrics")
+    - Ransom: demand money to remove malware
+    - Purger: program which removes all traces of the malware
+- AI program which pays attention to changing information in a system and allows finding the underlying variables causing specific changes in a computer system
+
+## Notes
+- Malware assumes that it is initially run with sudo privaleges. It is possible for at least portions of the malware to work with user privaleges if the system is inproperly configured.
 
 ## netedit
 Rust progam which iptables will forward new connections to which can modify connections.
@@ -17,16 +26,12 @@ Rust progam which iptables will forward new connections to which can modify conn
 1. Custom interface
     - Forward all traffic to custom interface.
     - Would require a lot of work
-2. Iptables
-    - Probably want to back this up before messing with it. `iptables-save > iptables-restore`
-    - Need to forward packets to a listening process. Write this in Rust.
-    - `sysctl net.ipv4.ip_forward=1`
-    - `iptables -t nat -I PREROUTING 1 -p tcp --dport 80 -j DNAT --to-destination 127.0.0.1:11110`
-3. Create custom dns resolver that forwards requests to custom server handler
-    - Messing with iptables is lowerlevel and more flexible
+2. Iptables (I choose this option)
+    - Fairly easy to do, and portable across linux systems.
+3. DNS
+    - Create custom dns resolver that resolves to a controlled computer. Provides easier configurability as you have control over the computer doing a lot of the "mal intent", but probably easy for infected computer to fix.
 4. nfqueues
-    - No. Seems to mostly be installed by default on RedHat distributions. Others one must install it first. Small population.
-
+    - Probably not. Seems to mostly be installed by default on RedHat distributions. Others one must install it first. Issues here.
 
 ### Steps to create self-replicating code that is difficult to remove
 The first goal is to find the code that is writing the file, so we can insert virus code in there.
@@ -75,7 +80,9 @@ I want to follow system calls to see where `m-static` is being written. I saw a 
 
 Now that I know which syscall and its arguments is probably writing the file, I can use gdb to step through to see what exactly happening.
 
-### TODO
+## TODO
+- Move scripts to manage iptables to netedit?
+- Make NetEdit more general. Extract the rick roll intercept to a separate program which uses NetEdit.
 - Test in docker container in order to isolate iptables?
 - Limit the redirects to something like 30% of the time on youtube videos
 - Right now only works on the host system. What about infecting the router (which are usually linux based), allows messing with a lot more people more efficiently.

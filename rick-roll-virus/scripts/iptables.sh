@@ -16,6 +16,7 @@ while [ $# -ge 1 ]; do
             ;;
 
         clear)
+            # clear iptables tables
             iptables -P INPUT ACCEPT
             iptables -P FORWARD ACCEPT
             iptables -P OUTPUT ACCEPT
