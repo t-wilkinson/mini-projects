@@ -4,7 +4,7 @@ use std::net::{Shutdown, TcpStream};
 const BUFFER_SIZE: usize = 128;
 
 /// Pipe incoming TcpStream to outgoing TcpStream
-pub fn pipe(mut incoming: TcpStream, mut outgoing: TcpStream) -> Result<(), String> {
+pub fn pipe(incoming: &mut TcpStream, outgoing: &mut TcpStream) -> Result<(), String> {
     let mut buffer = [0; BUFFER_SIZE];
     loop {
         match incoming.read(&mut buffer) {

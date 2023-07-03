@@ -51,15 +51,16 @@ pub fn parse_args(args: Vec<String>) -> Result<NetEdit, String> {
     });
 }
 
-pub fn proxy_connection(incoming_stream: TcpStream, dst_addr: &str) -> Result<(), String> {
+pub fn proxy_connection(mut incoming_stream: TcpStream, dst_addr: &str) -> Result<(), String> {
     let mut outgoing_stream = TcpStream::connect(dst_addr)
         .map_err(|e| format!("Could not establish connection to {}: {}", dst_addr, e))?;
 
     let mut incoming_stream_clone = incoming_stream.try_clone().map_err(|e| e.to_string())?;
     let mut outgoing_stream_clone = outgoing_stream.try_clone().map_err(|e| e.to_string())?;
 
-    let forward = spawn(move || proxy::pipe(incoming_stream, outgoing_stream));
-    let backward = spawn(move || proxy::pipe(outgoing_stream_clone, incoming_stream_clone));
+    let forward = spawn(move || proxy::pipe(&mut incoming_stream, &mut outgoing_stream));
+    let backward =
+        spawn(move || proxy::pipe(&mut outgoing_stream_clone, &mut incoming_stream_clone));
 
     forward
         .join()
